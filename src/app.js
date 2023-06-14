@@ -34,6 +34,20 @@ const app = (database) => {
         }
     });
 
+    app.get("/comment", async (req, res) =>{
+
+        try {
+            const rows = await database.getComments();
+            console.log(rows)
+            res.status(200).send(rows)
+        } catch (error) {
+            res.status(500).send({
+                status: 'error',
+                message: 'Database operation failed'
+            });
+        }
+    })
+
     return app;
 }
 

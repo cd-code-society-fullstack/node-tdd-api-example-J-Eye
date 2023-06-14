@@ -51,3 +51,49 @@ describe('POST /comment', () => {
         });
     });
 });
+
+describe('GET /comments', () =>{
+    let mockDatabase;
+    let testApp;
+    let mockData;
+    beforeEach(() =>{
+        mockDatabase = {
+            getComments: jest.fn()
+        }
+        testApp = app(mockDatabase)
+
+        mockData = [
+            {
+                "id": 2,
+                "name": "bingy",
+                "description": "Test bingy",
+                "createdAt": "2023-06-14T23:14:09.000Z"
+            },
+            {
+                "id": 1,
+                "name": "thingy",
+                "description": "Test tingy",
+                "createdAt": "2023-06-14T23:14:01.000Z"
+            }
+        ]
+    })
+
+    it('should respond with 200 and array of data', async () => {
+        mockDatabase.getComments.mockResolvedValue(mockData) //no semicollon
+        const response = await request(testApp)
+            .get("/comment")
+        expect(response.statusCode).toBe(200)
+        expect(response.body).toEqual(mockData)
+    })
+
+    it('should respond with 500 for database error', async () =>{
+        mockDatabase.getComments.mockRejectedValue(new Error('Database error'))
+        const response = await request(testApp)
+            .get("/comment")
+        expect(response.statusCode).toBe(500)
+        expect(response.body).toEqual({
+            status: 'error',
+            message: 'Database operation failed'
+        })
+    })
+})
